@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clockwork Core — Binary Addition Battle</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game">
+
+    <!-- ===== Top bar: both health bars + title ===== -->
+    <header class="hud">
+      <section class="hp hp--player">
+        <div class="hp__row">
+          <span class="hp__name">Player HP</span>
+          <span class="hp__num" id="playerHpText">100 / 100</span>
+        </div>
+        <div class="hp__bar" id="playerBar" role="progressbar" aria-label="Player health"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+          <div class="hp__fill" id="playerFill"></div>
+        </div>
+      </section>
+
+      <h1 class="title"><span aria-hidden="true">⚙</span> Clockwork Core <span aria-hidden="true">⚙</span></h1>
+
+      <section class="hp hp--guardian">
+        <div class="hp__row">
+          <span class="hp__name">Guardian HP</span>
+          <span class="hp__num" id="guardianHpText">100 / 100</span>
+        </div>
+        <div class="hp__bar" id="guardianBar" role="progressbar" aria-label="Guardian health"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+          <div class="hp__fill" id="guardianFill"></div>
+        </div>
+      </section>
+    </header>
+
+    <!-- ===== Arena: original SVG artwork (no image files needed) ===== -->
+    <section class="arena" id="arena">
+      <svg viewBox="0 0 800 400" role="img"
+           aria-label="A small cyan repair robot faces a huge bronze clockwork guardian in a glowing reactor arena.">
+        <defs>
+          <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0d0a14" />
+            <stop offset="0.6" stop-color="#2a1406" />
+            <stop offset="1" stop-color="#120a05" />
+          </linearGradient>
+          <radialGradient id="reactorGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#ffb347" stop-opacity="0.9" />
+            <stop offset="0.5" stop-color="#ff7a18" stop-opacity="0.35" />
+            <stop offset="1" stop-color="#ff7a18" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient id="reactorCol" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#7a3a08" />
+            <stop offset="0.5" stop-color="#ffcf6b" />
+            <stop offset="1" stop-color="#7a3a08" />
+          </linearGradient>
+          <linearGradient id="bronze" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f9d98a" />
+            <stop offset="0.5" stop-color="#c98a2b" />
+            <stop offset="1" stop-color="#7a4a12" />
+          </linearGradient>
+          <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffffff" />
+            <stop offset="1" stop-color="#aebdc9" />
+          </linearGradient>
+          <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#2b1a0c" />
+            <stop offset="1" stop-color="#0a0705" />
+          </linearGradient>
+          <!-- A soft glow we can add to any shape with filter="url(#glow)" -->
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <filter id="soft"><feGaussianBlur stdDeviation="7" /></filter>
+        </defs>
+
+        <!-- ---------- Background: reactor hall ---------- -->
+        <rect width="800" height="400" fill="url(#bgGrad)" />
+        <ellipse cx="400" cy="160" rx="340" ry="230" fill="url(#reactorGlow)" />
+
+        <!-- Glowing reactor column in the middle -->
+        <rect x="335" y="0" width="130" height="310" fill="url(#reactorCol)" />
+        <g fill="#2a1606" opacity="0.7">
+          <rect x="328" y="55" width="144" height="10" />
+          <rect x="328" y="125" width="144" height="10" />
+          <rect x="328" y="195" width="144" height="10" />
+          <rect x="328" y="265" width="144" height="10" />
+        </g>
+
+        <!-- Slowly turning background gears -->
+        <circle class="spin" cx="170" cy="100" r="52" fill="none" stroke="#3a2a4a" stroke-width="16" stroke-dasharray="16.3 16.3" />
+        <circle class="spin-rev" cx="640" cy="90" r="44" fill="none" stroke="#4a2a14" stroke-width="14" stroke-dasharray="13.8 13.8" />
+
+        <!-- Side pillars with neon strips (cyan left, orange right) -->
+        <rect x="0" y="0" width="70" height="340" fill="#161320" />
+        <rect x="32" y="20" width="8" height="300" fill="#38d9ff" filter="url(#glow)" />
+        <rect x="730" y="0" width="70" height="340" fill="#1b130f" />
+        <rect x="760" y="20" width="8" height="300" fill="#ffa63d" filter="url(#glow)" />
+
+        <!-- Pipes and a catwalk rail -->
+        <rect x="70" y="150" width="260" height="14" fill="#1d1a2a" />
+        <rect x="470" y="170" width="260" height="14" fill="#241912" />
+        <rect x="70" y="262" width="660" height="6" fill="#241912" />
+        <g fill="#ffb347" filter="url(#glow)">
+          <circle cx="110" cy="256" r="3" /><circle cx="200" cy="256" r="3" />
+          <circle cx="300" cy="256" r="3" /><circle cx="500" cy="256" r="3" />
+          <circle cx="600" cy="256" r="3" /><circle cx="690" cy="256" r="3" />
+        </g>
+
+        <!-- Floor with glowing seams -->
+        <rect x="0" y="335" width="800" height="65" fill="url(#floorGrad)" />
+        <g stroke="#ff9a3c" stroke-opacity="0.3" stroke-width="2">
+          <line x1="0" y1="352" x2="800" y2="352" />
+          <line x1="0" y1="376" x2="800" y2="376" />
+          <line x1="400" y1="335" x2="400" y2="400" />
+          <line x1="200" y1="335" x2="60" y2="400" />
+          <line x1="600" y1="335" x2="740" y2="400" />
+        </g>
+        <ellipse cx="140" cy="342" rx="75" ry="8" fill="#000" opacity="0.45" />
+        <ellipse cx="585" cy="350" rx="140" ry="10" fill="#000" opacity="0.45" />
+
+        <!-- Steam puffs -->
+        <g fill="#fff" filter="url(#soft)">
+          <circle class="steam" cx="95" cy="300" r="26" opacity="0.1" />
+          <circle class="steam steam--late" cx="720" cy="300" r="30" opacity="0.1" />
+        </g>
+
+        <!-- ---------- Player: small cyan-lit repair robot ---------- -->
+        <g transform="translate(60 170)">
+          <g id="robot" class="fighter">
+            <rect x="8" y="58" width="30" height="16" rx="8" fill="#6c7b88" transform="rotate(25 20 66)" /> <!-- back arm -->
+            <rect x="26" y="100" width="24" height="64" rx="10" fill="#3b4856" transform="rotate(20 38 104)" />
+            <rect x="64" y="100" width="24" height="64" rx="10" fill="#4a5968" transform="rotate(-16 76 104)" />
+            <rect x="2" y="156" width="36" height="14" rx="6" fill="#e3ecf2" />
+            <rect x="76" y="158" width="36" height="14" rx="6" fill="#e3ecf2" />
+            <rect x="28" y="40" width="64" height="68" rx="20" fill="url(#silver)" stroke="#6c7b88" stroke-width="3" /> <!-- torso -->
+            <circle cx="60" cy="74" r="16" fill="#06202b" stroke="#38d9ff" stroke-width="3" />
+            <circle class="spin" cx="60" cy="74" r="21" fill="none" stroke="#38d9ff" stroke-width="5" stroke-dasharray="6.6 6.6" filter="url(#glow)" />
+            <rect x="36" y="0" width="48" height="38" rx="14" fill="url(#silver)" stroke="#6c7b88" stroke-width="3" /> <!-- head -->
+            <rect x="43" y="10" width="34" height="15" rx="6" fill="#06202b" />
+            <circle cx="53" cy="17" r="4" fill="#7df3ff" filter="url(#glow)" />
+            <circle cx="67" cy="17" r="4" fill="#7df3ff" filter="url(#glow)" />
+            <line x1="60" y1="0" x2="60" y2="-12" stroke="#6c7b88" stroke-width="3" />
+            <circle cx="60" cy="-14" r="4" fill="#38d9ff" filter="url(#glow)" />
+            <rect x="82" y="52" width="70" height="22" rx="11" fill="#4a5968" /> <!-- cannon arm -->
+            <rect x="140" y="46" width="34" height="34" rx="12" fill="url(#silver)" stroke="#6c7b88" stroke-width="3" />
+            <circle class="pulse" cx="176" cy="63" r="12" fill="#7df3ff" filter="url(#glow)" />
+          </g>
+        </g>
+
+        <!-- ---------- Enemy: huge bronze clockwork guardian ---------- -->
+        <g transform="translate(470 50)">
+          <g id="guardian" class="fighter fighter--slow">
+            <rect x="45" y="225" width="52" height="75" rx="14" fill="#7a4a12" /> <!-- legs -->
+            <rect x="135" y="225" width="52" height="75" rx="14" fill="#6a3f0e" />
+            <rect x="35" y="285" width="72" height="18" rx="8" fill="#a8721f" />
+            <rect x="125" y="285" width="72" height="18" rx="8" fill="#a8721f" />
+            <line x1="20" y1="110" x2="-45" y2="95" stroke="#b27a22" stroke-width="44" stroke-linecap="round" /> <!-- arms -->
+            <line x1="210" y1="110" x2="275" y2="150" stroke="#b27a22" stroke-width="44" stroke-linecap="round" />
+            <rect x="25" y="65" width="182" height="175" rx="62" fill="url(#bronze)" stroke="#4a2a08" stroke-width="5" /> <!-- torso -->
+            <rect x="25" y="190" width="182" height="14" fill="#5a3509" opacity="0.55" />
+            <circle cx="22" cy="110" r="34" fill="url(#bronze)" stroke="#4a2a08" stroke-width="4" /> <!-- shoulders -->
+            <circle cx="210" cy="110" r="34" fill="url(#bronze)" stroke="#4a2a08" stroke-width="4" />
+            <circle cx="-48" cy="95" r="30" fill="url(#bronze)" stroke="#4a2a08" stroke-width="4" /> <!-- fists -->
+            <circle cx="280" cy="152" r="30" fill="url(#bronze)" stroke="#4a2a08" stroke-width="4" />
+            <rect x="76" y="18" width="80" height="52" rx="20" fill="url(#bronze)" stroke="#4a2a08" stroke-width="4" /> <!-- head -->
+            <rect x="90" y="36" width="52" height="11" rx="5" fill="#39ff6a" filter="url(#glow)" />
+            <rect x="112" y="-6" width="8" height="26" fill="#8a5a16" /> <!-- winding key -->
+            <ellipse cx="116" cy="-10" rx="30" ry="11" fill="none" stroke="#e0a63a" stroke-width="7" />
+            <circle cx="116" cy="140" r="46" fill="#08240f" stroke="#4a2a08" stroke-width="6" /> <!-- green core -->
+            <circle class="spin" cx="116" cy="140" r="36" fill="none" stroke="#39ff6a" stroke-width="12" stroke-dasharray="11.3 11.3" filter="url(#glow)" />
+            <circle cx="116" cy="140" r="24" fill="#22c55e" />
+            <path d="M116 126 L126 140 L116 154 L106 140 Z" fill="#052e12" />
+            <g fill="#4a2a08">
+              <circle cx="50" cy="90" r="4" /><circle cx="182" cy="90" r="4" />
+              <circle cx="50" cy="215" r="4" /><circle cx="182" cy="215" r="4" />
+            </g>
+          </g>
+        </g>
+
+        <!-- ---------- Attack effects (hidden until triggered) ---------- -->
+        <!-- Player's cyan blast, fired at the guardian on a correct answer -->
+        <g id="playerBeam" class="beam">
+          <path d="M236 233 L498 195" stroke="#7df3ff" stroke-width="12" stroke-linecap="round" filter="url(#glow)" />
+          <path d="M236 233 L498 195" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+          <circle cx="498" cy="195" r="24" fill="#cffaff" filter="url(#glow)" />
+        </g>
+        <!-- Guardian's orange counterattack, fired at the player on a wrong answer -->
+        <g id="guardianBeam" class="beam">
+          <path d="M495 225 L165 242" stroke="#ffa63d" stroke-width="14" stroke-linecap="round" filter="url(#glow)" />
+          <path d="M495 225 L165 242" stroke="#fff3c4" stroke-width="4" stroke-linecap="round" />
+          <circle cx="170" cy="242" r="16" fill="#ffd9a0" opacity="0.85" filter="url(#glow)" />
+        </g>
+      </svg>
+
+      <!-- "-20" / "-10" damage numbers float up in here -->
+      <div class="float-layer" id="floatLayer" aria-hidden="true"></div>
+    </section>
+
+    <!-- ===== Question + answer panel (solid, high contrast) ===== -->
+    <section class="panel" aria-labelledby="challengeTitle">
+      <div class="panel__top">
+        <span class="badge" id="turnLabel">Question 1</span>
+        <span class="hint">4-bit unsigned addition</span>
+      </div>
+
+      <h2 id="challengeTitle">Binary Challenge</h2>
+
+      <!-- Shown while the first question is loading, or if the server is unreachable -->
+      <p class="problem" id="problem" aria-live="polite">
+        <span id="numA">----</span> + <span id="numB">----</span> = ?
+      </p>
+
+      <!-- Four toggle buttons: click to flip 0 ⇄ 1. Leftmost = 8s place. -->
+      <div class="bits" id="bits" role="group" aria-label="Your answer, four bits">
+        <div class="bit-wrap"><button type="button" class="bit" data-index="0">0</button><span class="bit-place">8</span></div>
+        <div class="bit-wrap"><button type="button" class="bit" data-index="1">0</button><span class="bit-place">4</span></div>
+        <div class="bit-wrap"><button type="button" class="bit" data-index="2">0</button><span class="bit-place">2</span></div>
+        <div class="bit-wrap"><button type="button" class="bit" data-index="3">0</button><span class="bit-place">1</span></div>
+      </div>
+
+      <button type="button" class="btn btn--submit" id="submitBtn" disabled>Submit Answer</button>
+
+      <p class="rules">Correct: guardian −20 HP &nbsp;·&nbsp; Wrong: you −10 HP</p>
+
+      <!-- Error messages (server down, expired game, ...) -->
+      <div class="error" id="errorBox" role="alert" hidden>
+        <p id="errorText"></p>
+        <button type="button" class="btn btn--small" id="retryBtn">Start a new game</button>
+      </div>
+
+      <!-- Result of the last answer -->
+      <div class="feedback" id="feedback" aria-live="polite" hidden>
+        <p class="feedback__banner" id="feedbackBanner"></p>
+        <p class="feedback__line">Your answer: <code id="fbYours"></code> &nbsp; Correct 4-bit result: <code id="fbCorrect"></code></p>
+        <ol class="feedback__steps" id="fbSteps"></ol>
+        <button type="button" class="btn btn--next" id="nextBtn">Next question</button>
+      </div>
+    </section>
+
+    <!-- ===== Win / lose screen ===== -->
+    <div class="overlay" id="endScreen" role="dialog" aria-modal="true" aria-labelledby="endTitle" hidden>
+      <div class="end-card" id="endCard">
+        <h2 id="endTitle">Victory!</h2>
+        <p id="endMessage"></p>
+        <p class="end-hp" id="endHp"></p>
+        <button type="button" class="btn btn--submit" id="playAgainBtn">Play Again</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
